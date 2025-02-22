@@ -39,12 +39,6 @@ java -cp bin org.example.HexOustGame
 java -jar HexOust.jar
 ```
 
-## 🎮 How to Play
-1. **Objective**: Capture all opponent pieces to win.
-2. **Players**: Red & Blue take turns placing pieces.
-3. **Valid Moves**: Pieces can only be placed in **unoccupied hexes**.
-4. **Winning Condition**: A player wins when the opponent has no remaining pieces.
-
 ## 📌 Project Structure
 ```
 HexOust/
