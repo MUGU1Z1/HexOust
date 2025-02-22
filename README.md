@@ -62,17 +62,6 @@ HexOust/
 │── HexOust.jar                     # Executable JAR file
 ```
 
-## 🛠 Contribution
-We welcome contributions! To contribute:
-1. **Fork the repository**
-2. **Create a new branch**: `git checkout -b feature-branch`
-3. **Commit changes**: `git commit -m 'Added new feature'`
-4. **Push to GitHub**: `git push origin feature-branch`
-5. **Open a Pull Request**
-
-## 📜 License
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
 ## 🏆 Acknowledgments
 - Developed as part of the **COMP20050-SEP2-2024/25** course project.
 - Special thanks to all contributors!
