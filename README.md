@@ -1,7 +1,5 @@
 # HexOust - A Strategic Hexagonal Board Game
 
-![HexOust Banner](https://your-image-url.com/banner.png)
-
 ## 🎯 Introduction
 HexOust is a two-player strategy board game played on a **hexagonal 7x7 grid**. Players (Red and Blue) take turns placing pieces.
 
