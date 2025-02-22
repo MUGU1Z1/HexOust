@@ -3,7 +3,7 @@
 ![HexOust Banner](https://your-image-url.com/banner.png)
 
 ## 🎯 Introduction
-HexOust is a two-player strategy board game played on a **hexagonal 7x7 grid**. Players (Red and Blue) take turns placing pieces, aiming to capture and eliminate all opponent pieces. The game follows **capture and non-capture movement rules**.
+HexOust is a two-player strategy board game played on a **hexagonal 7x7 grid**. Players (Red and Blue) take turns placing pieces.
 
 ## 📜 Features
 - **Turn-based Gameplay**: Players take turns strategically placing pieces.
