@@ -62,7 +62,6 @@ public class BoardView extends Pane {
         hexagon.setOnMouseClicked(event -> handleCellClick(hexagon));
     }
 
-
     private void updateCellColor(int index) {
         Cell cell = controller.getBoard().getCell(index);
         Polygon hexagon = (Polygon) getChildren().get(index);
@@ -84,7 +83,17 @@ public class BoardView extends Pane {
                 updateCellColor(lastIndex);
             }
 
-            hexagon.setFill(Color.LIGHTGRAY);
+            // 根据可能的放置类型使用不同的高亮
+            Player currentPlayer = controller.getCurrentPlayer();
+            // 检查是否符合NCP规则
+            if (new org.example.controller.MoveValidator(controller.getBoard()).validateNonCapturingPlacement(currentPlayer, index)) {
+                // NCP模式下使用黄色高亮
+                hexagon.setFill(Color.YELLOW);
+            } else {
+                // CP模式下使用绿色高亮
+                hexagon.setFill(Color.LIGHTGREEN);
+            }
+
             lastHighlightedHexagon = hexagon;
         }
     }
@@ -97,13 +106,17 @@ public class BoardView extends Pane {
         }
     }
 
-
-
     private void handleCellClick(Polygon hexagon) {
         int index = (Integer) hexagon.getUserData();
 
         if (controller.makeMove(index)) {
+            // 更新被点击的单元格颜色
             updateCellColor(index);
+
+            // 更新所有棋子的显示
+            for (int i = 0; i < getChildren().size(); i++) {
+                updateCellColor(i);
+            }
 
             // 重置高亮状态
             if (lastHighlightedHexagon != null) {

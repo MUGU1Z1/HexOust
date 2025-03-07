@@ -6,6 +6,7 @@ org\example\model\Board.class
 org\example\controller\GameController.class
 org\example\model\GameState$PlayerChangeListener.class
 org\example\model\GameState.class
+org\example\model\GroupManager.class
 org\example\controller\MoveValidator.class
 org\example\model\Player.class
 org\example\view\BoardView.class

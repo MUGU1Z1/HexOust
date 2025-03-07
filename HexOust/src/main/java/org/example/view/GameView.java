@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -24,15 +25,14 @@ public class GameView extends Application {
     private final Label turnLabel;
     private final Circle redColorCircle;
     private final Circle blueColorCircle;
+    private Label captureLabel;
 
     public GameView() {
         controller = new GameController();
 
-        // 创建红色和蓝色的圆形示例
         redColorCircle = new Circle(10, Color.RED);
         blueColorCircle = new Circle(10, Color.BLUE);
 
-        // 创建 "Turn" 标签
         turnLabel = new Label("Turn");
         turnLabel.setStyle("-fx-font-size: 16;");
     }
@@ -53,15 +53,29 @@ public class GameView extends Application {
         Label titleLabel = new Label("HexOust Game");
         titleLabel.setStyle("-fx-font-size: 24; -fx-font-weight: bold;");
 
-        HBox statusBox = new HBox(5);
+        StackPane statusPane = new StackPane();
+        statusPane.setAlignment(Pos.CENTER);
+
+        HBox statusBox = new HBox(10);
         statusBox.setAlignment(Pos.CENTER);
 
         playerNameLabel = new Label();
         playerNameLabel.setStyle("-fx-font-size: 16;");
 
-        statusBox.getChildren().addAll(playerNameLabel, turnLabel);
+        // 使用已存在的 turnLabel，而不是创建新的
+        // 但可以修改其样式
+        turnLabel.setStyle("-fx-font-size: 16;");
 
-        topBox.getChildren().addAll(titleLabel, statusBox);
+        // 创建捕获模式标签 - 这个标签现在保留但默认不显示
+        captureLabel = new Label("Continuous Capture Mode");
+        captureLabel.setStyle("-fx-font-size: 14; -fx-text-fill: red;");
+        captureLabel.setVisible(false);
+
+        // 只添加玩家标签和回合标签，使用固定布局
+        statusBox.getChildren().addAll(playerNameLabel, turnLabel);
+        statusPane.getChildren().add(statusBox);
+
+        topBox.getChildren().addAll(titleLabel, statusPane);
         root.setTop(topBox);
 
         boardView = new BoardView(controller);
@@ -84,6 +98,51 @@ public class GameView extends Application {
 
         // 初始更新状态标签
         updateStatusLabel(controller.getCurrentPlayer());
+
+        // 添加游戏状态更新计时器
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.millis(100), event -> {
+                    updateCaptureUI();
+                })
+        );
+        timeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    /**
+     * 更新捕获UI状态
+     */
+    private void updateCaptureUI() {
+        Platform.runLater(() -> {
+            boolean isCaptureMode = controller.isContinueCaptureMode();
+            if (isCaptureMode) {
+                // 连续捕获模式下的提示
+                if (getCurrentPlayer().getColor() == PlayerColor.RED) {
+                    playerNameLabel.setText("Red Player");
+                    turnLabel.setText("Continuous Capture Mode");
+                } else {
+                    playerNameLabel.setText("Blue Player");
+                    turnLabel.setText("Continuous Capture Mode");
+                }
+            } else {
+                // 普通模式下的提示
+                if (getCurrentPlayer().getColor() == PlayerColor.RED) {
+                    playerNameLabel.setText("Red Player");
+                    turnLabel.setText("Turn");
+                } else {
+                    playerNameLabel.setText("Blue Player");
+                    turnLabel.setText("Turn");
+                }
+            }
+
+            // 隐藏额外的捕获模式标签，我们现在使用turnLabel显示模式信息
+            captureLabel.setVisible(false);
+        });
+    }
+
+    // 辅助方法，获取当前玩家
+    private Player getCurrentPlayer() {
+        return controller.getCurrentPlayer();
     }
 
     private void updateStatusLabel(Player currentPlayer) {
@@ -91,12 +150,15 @@ public class GameView extends Application {
             if (currentPlayer.getColor() == PlayerColor.RED) {
                 playerNameLabel.setTextFill(Color.RED);
                 playerNameLabel.setGraphic(redColorCircle);
+                playerNameLabel.setText("Red Player");
             } else {
                 playerNameLabel.setTextFill(Color.BLUE);
                 playerNameLabel.setGraphic(blueColorCircle);
+                playerNameLabel.setText("Blue Player");
             }
 
-            playerNameLabel.setText(currentPlayer.getName());
+            // 在这里不设置turnLabel的文本，让updateCaptureUI处理
+            updateCaptureUI();
         });
     }
 

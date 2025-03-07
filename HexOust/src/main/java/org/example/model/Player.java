@@ -16,9 +16,6 @@ public class Player {
     }
 
     public PlayerColor getColor() {
-        System.out.println("Getting color for player: " + name);
-        System.out.println("Player color value: " + color);
-        System.out.println("Color enum name: " + color.name());
         return color;
     }
 }
