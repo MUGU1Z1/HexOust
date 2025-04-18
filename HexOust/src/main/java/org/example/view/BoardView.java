@@ -83,14 +83,14 @@ public class BoardView extends Pane {
                 updateCellColor(lastIndex);
             }
 
-            // 根据可能的放置类型使用不同的高亮
+            // Use different highlights based on possible placement type
             Player currentPlayer = controller.getCurrentPlayer();
-            // 检查是否符合NCP规则
+            // Check if it complies with NCP rule
             if (new org.example.controller.MoveValidator(controller.getBoard()).validateNonCapturingPlacement(currentPlayer, index)) {
-                // NCP模式下使用黄色高亮
+                // Use yellow highlight in NCP mode
                 hexagon.setFill(Color.YELLOW);
             } else {
-                // CP模式下使用绿色高亮
+                // Use green highlight in CP mode
                 hexagon.setFill(Color.LIGHTGREEN);
             }
 
@@ -110,15 +110,15 @@ public class BoardView extends Pane {
         int index = (Integer) hexagon.getUserData();
 
         if (controller.makeMove(index)) {
-            // 更新被点击的单元格颜色
+            // Update the clicked cell color
             updateCellColor(index);
 
-            // 更新所有棋子的显示
+            // Update the display of all stones
             for (int i = 0; i < getChildren().size(); i++) {
                 updateCellColor(i);
             }
 
-            // 重置高亮状态
+            // Reset highlight state
             if (lastHighlightedHexagon != null) {
                 int lastIndex = (Integer) lastHighlightedHexagon.getUserData();
                 updateCellColor(lastIndex);
@@ -129,7 +129,7 @@ public class BoardView extends Pane {
 
     private Polygon createHexagon(double x, double y) {
         Polygon hexagon = new Polygon();
-        double angle = 0;  // 修改为0，使六边形顺时针旋转30度
+        double angle = 0;  // Changed to 0 to rotate the hexagon 30 degrees clockwise
 
         for (int i = 0; i < 6; i++) {
             double pointX = x + HEX_SIZE * Math.cos(angle + i * Math.PI / 3);

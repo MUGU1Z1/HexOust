@@ -22,106 +22,108 @@ public class MoveValidator {
     }
 
     /**
-     * 验证索引是否在有效范围内
+     * Validate if the index is within the valid range
      */
     public boolean validateMove(int index) {
-        // 验证索引是否在有效范围内（总共127个单元格）
+        // Validate if the index is within the valid range (total of 127 cells)
         return index >= 0 && index < 127;
     }
 
     /**
-     * 验证NCP规则：棋子不能与自己的棋子相邻，只能与对手的棋子相邻或独立放置
+     * Validate NCP rule: A stone cannot be adjacent to another stone of the same color,
+     * it can only be adjacent to opponent's stones or placed independently
      */
     public boolean validateNonCapturingPlacement(Player currentPlayer, int index) {
-        // 首先检查该位置是否为空
+        // First check if the position is empty
         Cell targetCell = board.getCell(index);
         if (targetCell == null || targetCell.isOccupied()) {
             return false;
         }
 
-        System.out.println("检查NCP规则: 索引 " + index);
+        System.out.println("Checking NCP rule: index " + index);
 
-        // 获取相邻的所有单元格
+        // Get all adjacent cells
         List<Cell> adjacentCells = getAdjacentCells(index);
-        System.out.println("找到 " + adjacentCells.size() + " 个相邻单元格");
+        System.out.println("Found " + adjacentCells.size() + " adjacent cells");
 
-        // 检查是否有自己的棋子相邻
+        // Check if there are any same-colored stones adjacent
         Color playerColor = currentPlayer.getColor() == PlayerColor.RED ? Color.RED : Color.BLUE;
-        System.out.println("当前玩家颜色: " + playerColor);
+        System.out.println("Current player color: " + playerColor);
 
         for (Cell adjacentCell : adjacentCells) {
             if (adjacentCell != null && adjacentCell.isOccupied()) {
-                System.out.println("相邻格有棋子，颜色: " + adjacentCell.getStoneColor());
-                // 检查棋子颜色是否与当前玩家相同
+                System.out.println("Adjacent cell has a stone, color: " + adjacentCell.getStoneColor());
+                // Check if the stone color is the same as the current player
                 if (adjacentCell.getStoneColor().equals(playerColor)) {
-                    System.out.println("发现与玩家颜色相同的相邻棋子，NCP规则验证失败");
-                    return false; // 如果有自己的棋子相邻，则不符合NCP规则
+                    System.out.println("Found adjacent stone with the same color as player, NCP rule validation failed");
+                    return false; // If there's a same-colored stone adjacent, it doesn't comply with NCP rule
                 }
             }
         }
 
-        System.out.println("NCP规则验证通过");
-        // 如果没有自己的棋子相邻，则符合NCP规则
+        System.out.println("NCP rule validation passed");
+        // If there are no same-colored stones adjacent, it complies with NCP rule
         return true;
     }
 
     /**
-     * 验证CP规则：棋子必须与自己的棋子相邻，形成更大的组，且新组必须至少与一个对手棋子相邻
+     * Validate CP rule: Stone must be adjacent to player's own stones, forming a larger group,
+     * and the new group must be adjacent to at least one opponent's stone
      */
     public boolean validateCapturingPlacement(Player player, int index) {
-        System.out.println("验证CP规则: 位置 " + index);
+        System.out.println("Validating CP rule: position " + index);
 
-        // 首先检查该位置是否为空
+        // First check if the position is empty
         Cell targetCell = board.getCell(index);
         if (targetCell == null || targetCell.isOccupied()) {
-            System.out.println("位置为null或已被占用");
+            System.out.println("Position is null or already occupied");
             return false;
         }
 
-        // 检查相邻位置是否有当前玩家的棋子
+        // Check if there are any player's stones adjacent
         List<Integer> adjacentPlayerPositions = getAdjacentPlayerPositions(player, index);
         if (adjacentPlayerPositions.isEmpty()) {
-            System.out.println("没有与当前玩家相邻的棋子");
+            System.out.println("No stones of current player adjacent");
             return false;
         }
 
-        // 获取放置后会形成的新组
+        // Get the new group that would be formed after placement
         Set<Integer> newGroup = simulateNewGroup(player, index, adjacentPlayerPositions);
 
-        // 检查新组是否与至少一个对手棋子相邻
+        // Check if the new group is adjacent to at least one opponent's stone
         List<List<Integer>> adjacentOpponentGroups = getAdjacentOpponentGroups(newGroup, player.getColor());
         if (adjacentOpponentGroups.isEmpty()) {
-            System.out.println("新组没有与对手棋子相邻");
+            System.out.println("New group is not adjacent to any opponent stones");
             return false;
         }
 
-        System.out.println("CP规则验证通过");
+        System.out.println("CP rule validation passed");
         return true;
     }
 
     /**
-     * 执行捕获逻辑
+     * Execute capture logic
      */
     public List<Integer> executeCapture(Player player, int index) {
         List<Integer> capturedPositions = new ArrayList<>();
 
-        // 获取相邻的玩家棋子位置
+        // Get adjacent player stone positions
         List<Integer> adjacentPlayerPositions = getAdjacentPlayerPositions(player, index);
         if (adjacentPlayerPositions.isEmpty()) {
             return capturedPositions;
         }
 
-        // 模拟放置棋子后形成的新组
+        // Simulate the new group that would be formed after placement
         Set<Integer> newGroup = simulateNewGroup(player, index, adjacentPlayerPositions);
 
-        // 获取相邻的对手组
+        // Get adjacent opponent groups
         List<List<Integer>> adjacentOpponentGroups = getAdjacentOpponentGroups(newGroup, player.getColor());
 
-        // 检查是否可以捕获
+        // Check if capture is possible
         int newGroupSize = newGroup.size();
         for (List<Integer> opponentGroup : adjacentOpponentGroups) {
             if (newGroupSize > opponentGroup.size()) {
-                // 捕获这个对手组
+                // Capture this opponent group
                 capturedPositions.addAll(opponentGroup);
             }
         }
@@ -130,12 +132,12 @@ public class MoveValidator {
     }
 
     /**
-     * 获取相邻的单元格
+     * Get adjacent cells
      */
     private List<Cell> getAdjacentCells(int index) {
         List<Cell> adjacentCells = new ArrayList<>();
 
-        // 将索引转换为二维坐标
+        // Convert index to 2D coordinates
         int[] coordinates = convertIndexToCoordinates(index);
         if (coordinates == null) {
             return adjacentCells;
@@ -144,55 +146,55 @@ public class MoveValidator {
         int row = coordinates[0];
         int col = coordinates[1];
 
-        System.out.println("获取相邻单元格，坐标: [" + row + ", " + col + "]");
+        System.out.println("Getting adjacent cells, coordinates: [" + row + ", " + col + "]");
 
-        // 根据列的位置确定相邻方向
+        // Determine adjacent directions based on row position
         int[][] directions;
 
-        // 根据列的位置选择不同的方向数组
+        // Choose different direction arrays based on row position
         if (row < 6) {
-            // 前六列
+            // First six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {0, 1},   // 右上
-                    {0, -1},  // 左下
-                    {1, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {0, 1},   // Upper right
+                    {0, -1},  // Lower left
+                    {1, 1},   // Lower right
+                    {1, 0}    // Down
             };
-            System.out.println("使用前六列的方向偏移");
+            System.out.println("Using first six rows direction offsets");
         } else if (row == 6) {
-            // 第七列
+            // Seventh row
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {-1, 1},  // 右上
-                    {0, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {-1, 1},  // Upper right
+                    {0, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
-            System.out.println("使用第七列的方向偏移");
+            System.out.println("Using seventh row direction offsets");
         } else {
-            // 后六列
+            // Last six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {0, -1},  // 左上
-                    {-1, 1},  // 右上
-                    {1, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {0, -1},  // Upper left
+                    {-1, 1},  // Upper right
+                    {1, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
-            System.out.println("使用后六列的方向偏移");
+            System.out.println("Using last six rows direction offsets");
         }
 
-        // 检查所有方向的相邻单元格
+        // Check adjacent cells in all directions
         for (int[] dir : directions) {
             int newRow = row + dir[0];
             int newCol = col + dir[1];
 
             Cell cell = board.getCell(newRow, newCol);
             if (cell != null) {
-                System.out.println("找到相邻单元格，坐标: [" + newRow + ", " + newCol + "]");
+                System.out.println("Found adjacent cell, coordinates: [" + newRow + ", " + newCol + "]");
                 adjacentCells.add(cell);
             }
         }
@@ -201,7 +203,7 @@ public class MoveValidator {
     }
 
     /**
-     * 获取相邻的玩家棋子位置
+     * Get positions of adjacent player stones
      */
     private List<Integer> getAdjacentPlayerPositions(Player player, int index) {
         List<Integer> adjacentPlayerPositions = new ArrayList<>();
@@ -220,13 +222,13 @@ public class MoveValidator {
     }
 
     /**
-     * 模拟放置棋子后会形成的新组
+     * Simulate the new group that would be formed after stone placement
      */
     private Set<Integer> simulateNewGroup(Player player, int index, List<Integer> adjacentPlayerPositions) {
         Set<Integer> newGroup = new HashSet<>();
         newGroup.add(index);
 
-        // 获取所有相邻玩家棋子所在的组
+        // Get all groups containing the adjacent player stones
         for (int pos : adjacentPlayerPositions) {
             List<Integer> group = groupManager.getGroup(pos);
             newGroup.addAll(group);
@@ -236,7 +238,7 @@ public class MoveValidator {
     }
 
     /**
-     * 获取与指定组相邻的所有对手棋子组
+     * Get all opponent stone groups adjacent to the specified group
      */
     private List<List<Integer>> getAdjacentOpponentGroups(Set<Integer> group, PlayerColor playerColor) {
         Set<Integer> checkedOpponentPositions = new HashSet<>();
@@ -247,16 +249,16 @@ public class MoveValidator {
 
             for (int adjacentPos : adjacentPositions) {
                 Cell adjacentCell = board.getCell(adjacentPos);
-                // 检查是否是对手的棋子，且之前没有检查过
+                // Check if it's an opponent's stone and hasn't been checked before
                 if (adjacentCell != null && adjacentCell.isOccupied()
                         && !isSamePlayerColor(adjacentCell, playerColor)
                         && !checkedOpponentPositions.contains(adjacentPos)) {
 
-                    // 找到对手的一个组
+                    // Found an opponent group
                     List<Integer> opponentGroup = groupManager.getGroup(adjacentPos);
                     opponentGroups.add(opponentGroup);
 
-                    // 标记这个组中的所有位置为已检查
+                    // Mark all positions in this group as checked
                     checkedOpponentPositions.addAll(opponentGroup);
                 }
             }
@@ -266,7 +268,7 @@ public class MoveValidator {
     }
 
     /**
-     * 获取指定位置的所有相邻位置
+     * Get all adjacent positions for a specified position
      */
     public List<Integer> getAdjacentPositions(int index) {
         List<Integer> adjacentPositions = new ArrayList<>();
@@ -278,49 +280,49 @@ public class MoveValidator {
         int row = coordinates[0];
         int col = coordinates[1];
 
-        // 根据列的位置确定相邻方向
+        // Determine adjacent directions based on row position
         int[][] directions;
 
-        // 根据列的位置选择不同的方向数组
+        // Choose different direction arrays based on row position
         if (row < 6) {
-            // 前六列
+            // First six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {0, 1},   // 右上
-                    {0, -1},  // 左下
-                    {1, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {0, 1},   // Upper right
+                    {0, -1},  // Lower left
+                    {1, 1},   // Lower right
+                    {1, 0}    // Down
             };
         } else if (row == 6) {
-            // 第七列
+            // Seventh row
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {-1, 1},  // 右上
-                    {0, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {-1, 1},  // Upper right
+                    {0, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
         } else {
-            // 后六列
+            // Last six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {0, -1},  // 左上
-                    {-1, 1},  // 右上
-                    {1, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {0, -1},  // Upper left
+                    {-1, 1},  // Upper right
+                    {1, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
         }
 
-        // 检查所有方向的相邻单元格
+        // Check adjacent cells in all directions
         for (int[] dir : directions) {
             int newRow = row + dir[0];
             int newCol = col + dir[1];
 
             if (board.getCell(newRow, newCol) != null) {
-                // 将坐标转换回索引
+                // Convert coordinates back to index
                 int adjacentIndex = convertCoordinatesToIndex(newRow, newCol);
                 if (adjacentIndex >= 0) {
                     adjacentPositions.add(adjacentIndex);
@@ -332,7 +334,7 @@ public class MoveValidator {
     }
 
     /**
-     * 检查单元格中的棋子颜色是否与指定玩家颜色相同
+     * Check if the stone color in the cell is the same as the specified player color
      */
     private boolean isSamePlayerColor(Cell cell, PlayerColor playerColor) {
         if (playerColor == PlayerColor.RED) {
@@ -343,7 +345,7 @@ public class MoveValidator {
     }
 
     /**
-     * 将索引转换为二维坐标
+     * Convert index to 2D coordinates
      */
     private int[] convertIndexToCoordinates(int index) {
         int[] totalHexesPerRow = {7, 8, 9, 10, 11, 12, 13, 12, 11, 10, 9, 8, 7};
@@ -362,7 +364,7 @@ public class MoveValidator {
     }
 
     /**
-     * 将二维坐标转换为索引
+     * Convert 2D coordinates to index
      */
     private int convertCoordinatesToIndex(int row, int col) {
         int[] totalHexesPerRow = {7, 8, 9, 10, 11, 12, 13, 12, 11, 10, 9, 8, 7};

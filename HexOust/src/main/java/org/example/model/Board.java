@@ -2,7 +2,7 @@ package org.example.model;
 
 public class Board {
     private final Cell[][] grid;
-    private final int SIZE = 13;  // 更改为13以匹配实际板面大小
+    private final int SIZE = 13;  // Changed to 13 to match actual board size
 
     public Board() {
         grid = new Cell[SIZE][SIZE];
@@ -91,6 +91,4 @@ public class Board {
         }
         return null;
     }
-
-
 }

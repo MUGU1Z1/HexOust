@@ -29,7 +29,7 @@ public class Cell {
         return occupiedBy;
     }
 
-    // 添加这个方法，用于获取当前格子的颜色
+    // Add this method to get the color of the current cell
     public Color getStoneColor() {
         if (occupiedBy == null) {
             System.out.println("Cell is not occupied");
@@ -49,6 +49,4 @@ public class Cell {
     public int getY() {
         return y;
     }
-
-
 }

@@ -3,7 +3,7 @@ package org.example.model;
 import java.util.*;
 
 /**
- * 管理棋盘上的棋子组
+ * Manages stone groups on the board
  */
 public class GroupManager {
     private final Board board;
@@ -13,9 +13,9 @@ public class GroupManager {
     }
 
     /**
-     * 获取指定位置所在的组
-     * @param index 棋子索引
-     * @return 包含该位置的所有连接的棋子列表
+     * Gets the group that contains the specified position
+     * @param index Stone index
+     * @return List of all connected stones in the same group
      */
     public List<Integer> getGroup(int index) {
         Cell cell = board.getCell(index);
@@ -34,12 +34,12 @@ public class GroupManager {
             int currentIndex = queue.poll();
             group.add(currentIndex);
 
-            // 获取所有相邻位置
+            // Get all adjacent positions
             List<Integer> adjacentPositions = getAdjacentPositions(currentIndex);
 
             for (int adjacentIndex : adjacentPositions) {
                 Cell adjacentCell = board.getCell(adjacentIndex);
-                // 如果相邻单元格有棋子且颜色相同，且未被访问过
+                // If adjacent cell has a stone of the same color and hasn't been visited
                 if (adjacentCell != null && adjacentCell.isOccupied()
                         && adjacentCell.getStoneColor().equals(cell.getStoneColor())
                         && !visited.contains(adjacentIndex)) {
@@ -53,9 +53,9 @@ public class GroupManager {
     }
 
     /**
-     * 获取指定位置的所有相邻位置
-     * @param index 位置索引
-     * @return 相邻位置索引列表
+     * Gets all adjacent positions for a specified position
+     * @param index Position index
+     * @return List of adjacent position indices
      */
     public List<Integer> getAdjacentPositions(int index) {
         List<Integer> adjacentPositions = new ArrayList<>();
@@ -67,49 +67,49 @@ public class GroupManager {
         int row = coordinates[0];
         int col = coordinates[1];
 
-        // 根据列的位置确定相邻方向
+        // Determine adjacent directions based on row position
         int[][] directions;
 
-        // 根据列的位置选择不同的方向数组
+        // Choose different direction arrays based on row position
         if (row < 6) {
-            // 前六列
+            // First six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {0, 1},   // 右上
-                    {0, -1},  // 左下
-                    {1, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {0, 1},   // Upper right
+                    {0, -1},  // Lower left
+                    {1, 1},   // Lower right
+                    {1, 0}    // Down
             };
         } else if (row == 6) {
-            // 第七列
+            // Seventh row
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {-1, -1}, // 左上
-                    {-1, 1},  // 右上
-                    {0, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {-1, -1}, // Upper left
+                    {-1, 1},  // Upper right
+                    {0, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
         } else {
-            // 后六列
+            // Last six rows
             directions = new int[][]{
-                    {-1, 0},  // 正上
-                    {0, -1},  // 左上
-                    {-1, 1},  // 右上
-                    {1, -1},  // 左下
-                    {0, 1},   // 右下
-                    {1, 0}    // 正下
+                    {-1, 0},  // Up
+                    {0, -1},  // Upper left
+                    {-1, 1},  // Upper right
+                    {1, -1},  // Lower left
+                    {0, 1},   // Lower right
+                    {1, 0}    // Down
             };
         }
 
-        // 检查所有方向的相邻单元格
+        // Check adjacent cells in all directions
         for (int[] dir : directions) {
             int newRow = row + dir[0];
             int newCol = col + dir[1];
 
             if (board.getCell(newRow, newCol) != null) {
-                // 将坐标转换回索引
+                // Convert coordinates back to index
                 int adjacentIndex = convertCoordinatesToIndex(newRow, newCol);
                 if (adjacentIndex >= 0) {
                     adjacentPositions.add(adjacentIndex);
@@ -121,9 +121,9 @@ public class GroupManager {
     }
 
     /**
-     * 将索引转换为二维坐标
-     * @param index 索引
-     * @return 二维坐标数组[row, col]
+     * Convert index to 2D coordinates
+     * @param index Index
+     * @return 2D coordinate array [row, col]
      */
     private int[] convertIndexToCoordinates(int index) {
         int[] totalHexesPerRow = {7, 8, 9, 10, 11, 12, 13, 12, 11, 10, 9, 8, 7};
@@ -142,10 +142,10 @@ public class GroupManager {
     }
 
     /**
-     * 将二维坐标转换为索引
-     * @param row 行
-     * @param col 列
-     * @return 索引
+     * Convert 2D coordinates to index
+     * @param row Row
+     * @param col Column
+     * @return Index
      */
     private int convertCoordinatesToIndex(int row, int col) {
         int[] totalHexesPerRow = {7, 8, 9, 10, 11, 12, 13, 12, 11, 10, 9, 8, 7};
